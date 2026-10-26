@@ -8,12 +8,16 @@ import {
 } from '../lib/calendario';
 import { diaAtual, limitesDia, rotuloDia } from '../lib/tempo';
 
-export type Aba = Vista | 'minhas';
+export type Aba = Vista | 'minhas' | 'gestao' | 'estatisticas';
 export type Origem = { vista: 'mes' | 'semana'; dia: string };
 const ligacaoDia = (d: string, origem: Origem) => `/reservas?vista=dia&dia=${d}&vo=${origem.vista}&do=${origem.dia}`;
 
-/** Barra de navegação: vistas, setas, «Hoje» e o título do período. */
-export function Barra({ vista, dia, origem, aba }: { vista: Vista; dia: string; origem?: Origem; aba: Aba }) {
+const TITULOS: Partial<Record<Aba, string>> = {
+  minhas: 'As minhas reservas futuras', gestao: 'Controlo e Gestão', estatisticas: 'Estatísticas',
+};
+
+/** Barra de navegação: vistas, setas, «Hoje» e o título do período. Só a responsável vê Controlo e Estatísticas. */
+export function Barra({ vista, dia, origem, aba, gestao }: { vista: Vista; dia: string; origem?: Origem; aba: Aba; gestao: boolean }) {
   const sufixo = vista === 'dia' && origem ? `&vo=${origem.vista}&do=${origem.dia}` : '';
   const nav = (v: Vista, d: string) => `/reservas?vista=${v}&dia=${d}${sufixo}`;
   const titulo =
@@ -23,22 +27,28 @@ export function Barra({ vista, dia, origem, aba }: { vista: Vista; dia: string; 
   const abas: { v: Vista; nome: string }[] = [
     { v: 'dia', nome: 'Dia' }, { v: 'semana', nome: 'Semana' }, { v: 'mes', nome: 'Mês' },
   ];
+  const calendario = aba === 'dia' || aba === 'semana' || aba === 'mes';
   return (
     <div className="barra-cal">
       <div className="segmentos">
         {abas.map((a) => (
           <Link key={a.v} href={`/reservas?vista=${a.v}&dia=${dia}`} className={aba === a.v ? 'ativo' : ''}>{a.nome}</Link>
         ))}
-        <Link href="/reservas?vista=minhas" className={`minhas ${aba === 'minhas' ? 'ativo' : ''}`}>Minhas reservas</Link>
+        {gestao ? <>
+          <Link href="/reservas?vista=gestao" className={`minhas ${aba === 'gestao' ? 'ativo' : ''}`}>Controlo e Gestão</Link>
+          <Link href="/reservas?vista=estatisticas" className={`estat ${aba === 'estatisticas' ? 'ativo' : ''}`}>Estatísticas</Link>
+        </> : (
+          <Link href="/reservas?vista=minhas" className={`minhas ${aba === 'minhas' ? 'ativo' : ''}`}>Minhas reservas</Link>
+        )}
       </div>
-      {aba === 'minhas' ? <strong className="titulo">As minhas reservas futuras</strong> : <>
+      {calendario ? <>
         <div className="setas">
           <Link href={nav(vista, navegar(vista, dia, -1))} aria-label="Anterior">‹</Link>
           <Link href={nav(vista, diaAtual())} className="hoje">Hoje</Link>
           <Link href={nav(vista, navegar(vista, dia, 1))} aria-label="Seguinte">›</Link>
         </div>
         <strong className="titulo">{titulo}</strong>
-      </>}
+      </> : <strong className="titulo">{TITULOS[aba]}</strong>}
     </div>
   );
 }

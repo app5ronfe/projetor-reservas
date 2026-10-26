@@ -68,7 +68,7 @@ export async function cancelarAcao(f: FormData) {
   if (txt(f, 'avisei') !== 'sim') voltar(`/reservas?dia=${dia}`, { erro: 'Antes de cancelar, avise a Chefe Daniela.' });
   const sb = await clienteServidor();
   const { error } = await sb.rpc('projetor_cancelar', { p_id: txt(f, 'id') });
-  const destino = txt(f, 'destino') === '/secretaria' ? `/secretaria?dia=${dia}` : `/reservas?dia=${dia}`;
+  const destino = txt(f, 'destino') === 'gestao' ? '/reservas?vista=gestao' : `/secretaria?dia=${dia}`;
   if (error) voltar(destino, { erro: traduzirErro(error.message).mensagem });
   voltar(destino, { ok: 'Reserva cancelada. A secretaria foi avisada.' });
 }
@@ -82,7 +82,7 @@ export async function editarAcao(f: FormData) {
     p_fim: instante(dia, txt(f, 'fim')).toISOString(),
     ...dados(f),
   });
-  const destino = `/secretaria?dia=${dia}`;
+  const destino = txt(f, 'destino') === 'gestao' ? '/reservas?vista=gestao' : `/secretaria?dia=${dia}`;
   if (error) voltar(destino, { erro: traduzirErro(error.message).mensagem });
   voltar(destino, { ok: 'Reserva atualizada.' });
 }

@@ -145,3 +145,17 @@ ul.lista li:last-child { border-bottom:0; }
 /* Semana no telemóvel: só as cores; o texto aparece a partir de 600px */
 .agenda.semana .ag-txt { display:none; }
 @media (min-width:600px) { .agenda.semana .ag-txt { display:block; } }
+
+/* Controlo e Gestão, Estatísticas */
+.acoes-gestao { display:flex; justify-content:flex-end; margin-bottom:10px; }
+.mais { position:relative; }
+.mais > summary { list-style:none; cursor:pointer; width:auto; display:inline-block; padding:10px 16px; margin:0; }
+.mais > summary::-webkit-details-marker { display:none; }
+.mais-lista { position:absolute; right:0; top:calc(100% + 6px); z-index:20; background:#fff; border:1px solid var(--borda); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; min-width:200px; overflow:hidden; }
+.mais-lista a { padding:12px 14px; color:var(--cor); text-decoration:none; font-weight:600; font-size:14px; border-bottom:1px solid #EEF0EC; }
+.filtro { display:flex; flex-direction:column; gap:4px; }
+.tab-est { width:100%; border-collapse:collapse; font-size:14px; }
+.tab-est th, .tab-est td { padding:8px 6px; border-bottom:1px solid #EEF0EC; text-align:left; }
+.tab-est th { font-size:12px; color:var(--texto-suave); font-weight:600; }
+.tab-est .num { text-align:right; font-variant-numeric:tabular-nums; }
+.tab-est tr.total td { font-weight:700; border-bottom:0; }
