@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useState, type CSSProperties } from 'react';
 import type { Reserva, Bloqueio } from '../lib/projetor';
 import { corDaReserva } from '../lib/cores';
-import { horaDe, limitesDia } from '../lib/tempo';
-import { prazoPassado, sobrepoe } from '../lib/regras';
+import { formatarInstante, horaDe, limitesDia } from '../lib/tempo';
+import { prazoPassado, prazoReserva, sobrepoe } from '../lib/regras';
 import { DIAS_CURTOS, diaDaSemana, ehHoje } from '../lib/calendario';
 
 /** Altura de uma hora, em píxeis. */
@@ -23,9 +23,12 @@ type Props = {
   voltar?: { href: string; texto: string };
 };
 
+type Aviso = { titulo: string; texto: string; urgencia: boolean };
+
 /** Agenda por horas (dia ou semana). Cada reserva é uma linha colorida; ao tocar, abre um balão. */
 export default function Agenda({ dias, reservas, bloqueios, gestao, agoraIso, voltar }: Props) {
   const [aberto, setAberto] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<Aviso | null>(null);
   const agora = new Date(agoraIso);
   const n = dias.length;
 
@@ -59,17 +62,40 @@ export default function Agenda({ dias, reservas, bloqueios, gestao, agoraIso, vo
 
             return (
               <div key={d} className={`ag-col ${esquerda ? '' : 'direita'}`}>
-                {/* Horas livres e reserváveis: tocar leva a «Reservar» nessa hora. */}
+                {/* Cada hora: livre e reservável = link; livre mas não reservável ou bloqueada = aviso explicativo. */}
                 {Array.from({ length: 24 }, (_, h) => {
                   const ini = new Date(base.getTime() + h * 3600000);
                   const fim = new Date(ini.getTime() + 3600000);
-                  const ocupada = [...dasReservas, ...dosBloqueios].some((x) =>
-                    sobrepoe({ inicio: new Date(x.inicio), fim: new Date(x.fim) }, { inicio: ini, fim }));
-                  const reservavel = !ocupada && ini >= agora && (gestao || !prazoPassado(ini, agora));
-                  if (!reservavel) return null;
+                  const janelaHora = { inicio: ini, fim };
+                  if (dasReservas.some((x) => sobrepoe({ inicio: new Date(x.inicio), fim: new Date(x.fim) }, janelaHora))) return null;
+                  const bloq = dosBloqueios.find((x) => sobrepoe({ inicio: new Date(x.inicio), fim: new Date(x.fim) }, janelaHora));
+                  const estilo = { top: h * HORA_PX, height: HORA_PX };
+                  const rotulo = `${p2(h)}:00`;
+
+                  if (bloq) {
+                    return (
+                      <button key={h} type="button" className="ag-slot bloq-slot" style={estilo} aria-label={`${rotulo} bloqueado`}
+                        onClick={() => setAviso({ titulo: 'Bloqueado pela secretaria', texto: `Este horário está bloqueado: ${bloq.motivo}.`, urgencia: true })} />
+                    );
+                  }
+                  if (ini < agora) {
+                    return (
+                      <button key={h} type="button" className="ag-slot passado" style={estilo} aria-label={`${rotulo} já passou`}
+                        onClick={() => setAviso({ titulo: 'Horário já passado', texto: 'Este horário já começou ou passou. Os dias passados ficam só para consulta.', urgencia: false })} />
+                    );
+                  }
+                  if (gestao || !prazoPassado(ini, agora)) {
+                    return (
+                      <Link key={h} href={`/reservar?dia=${d}&inicio=${rotulo}`} className="ag-slot" style={estilo} aria-label={`Reservar às ${rotulo}`} />
+                    );
+                  }
                   return (
-                    <Link key={h} href={`/reservar?dia=${d}&inicio=${p2(h)}:00`} className="ag-slot"
-                      style={{ top: h * HORA_PX, height: HORA_PX }} aria-label={`Reservar às ${p2(h)}:00`} />
+                    <button key={h} type="button" className="ag-slot fechado" style={estilo} aria-label={`${rotulo} fora do prazo`}
+                      onClick={() => setAviso({
+                        titulo: 'Prazo terminado',
+                        texto: `Já não é possível reservar este bloco pela app. As reservas fecham às ${formatarInstante(prazoReserva(ini))}, ou seja, às 21:00 do dia anterior.`,
+                        urgencia: true,
+                      })} />
                   );
                 })}
 
@@ -113,7 +139,18 @@ export default function Agenda({ dias, reservas, bloqueios, gestao, agoraIso, vo
           })}
         </div>
       </div>
-      {aberto && <div className="ag-fundo" onClick={() => setAberto(null)} />}
+
+      {(aberto || aviso) && (
+        <div className="ag-fundo" onClick={() => { setAberto(null); setAviso(null); }} />
+      )}
+      {aviso && (
+        <div className="aviso-pop" role="dialog" aria-modal="true">
+          <strong>{aviso.titulo}</strong>
+          <p>{aviso.texto}</p>
+          {aviso.urgencia && <p className="pequeno">Se for urgente, contacte a Chefe Daniela.</p>}
+          <button type="button" className="btn secundario" onClick={() => setAviso(null)}>Fechar</button>
+        </div>
+      )}
     </>
   );
 }

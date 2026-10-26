@@ -31,7 +31,10 @@ export default async function Reservas({ searchParams }: { searchParams: Promise
   return (
     <>
       <header>
-        <h1>Secretaria 5 Ronfe</h1>
+        <div>
+          <h1>Secretaria 5 Ronfe</h1>
+          <span className="quem">{eu.nome}</span>
+        </div>
         <form action={sairAcao}><button type="submit" className="link">Sair</button></form>
       </header>
       <main>
