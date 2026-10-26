@@ -1,0 +1,11 @@
+{
+  "name": "Secretaria 5 Ronfe",
+  "short_name": "Secretaria 5",
+  "start_url": "/reservas",
+  "display": "standalone",
+  "background_color": "#1F2523",
+  "theme_color": "#227956",
+  "icons": [
+    { "src": "/marca/emblema.png", "sizes": "475x512", "type": "image/png", "purpose": "any" }
+  ]
+}
