@@ -41,7 +41,7 @@ const MENSAGENS: Record<string, string> = {
 /** Converte a mensagem do Postgres num código estável e numa frase em português. */
 export function traduzirErro(mensagem: string): Erro {
   const codigo = Object.keys(MENSAGENS).find((c) => mensagem.includes(c)) ?? 'ERRO';
-  return { codigo, mensagem: MENSAGENS[codigo] ?? 'Não foi possível concluir. Tente outra vez.' };
+  return { codigo, mensagem: MENSAGENS[codigo] ?? `Não foi possível concluir (${mensagem.slice(0, 160)}).` };
 }
 
 export async function sessaoAtual(): Promise<Sessao | null> {

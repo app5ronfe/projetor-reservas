@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation';
 import { sessaoAtual, seccoes, departamentos, ENTIDADES, reservasEntre, bloqueiosEntre, caixaDaGestao, previsaoBloqueio } from '../../lib/projetor';
 import { diaAtual, limitesDia, instante, formatarInstante, horaDe } from '../../lib/tempo';
 import GradeDia, { NavDia } from '../../components/GradeDia';
-import { cancelarAcao, editarAcao, prepararBloqueioAcao, confirmarBloqueioAcao, sairAcao } from '../actions';
+import { RemoverReserva } from '../../components/Gestao';
+import { editarAcao, prepararBloqueioAcao, confirmarBloqueioAcao, sairAcao } from '../actions';
 
 type Q = { dia?: string; seccao?: string; ok?: string; erro?: string; confirmar?: string; bi?: string; bf?: string; bm?: string };
 
@@ -82,13 +83,7 @@ export default async function Secretaria({ searchParams }: { searchParams: Promi
                     <button type="submit" className="btn">Guardar alterações</button>
                   </form>
                 </details>
-                <form action={cancelarAcao}>
-                  <input type="hidden" name="id" value={r.id} />
-                  <input type="hidden" name="dia" value={dia} />
-                  <input type="hidden" name="avisei" value="sim" />
-                  <input type="hidden" name="destino" value="/secretaria" />
-                  <button type="submit" className="btn perigo">Remover reserva</button>
-                </form>
+                <RemoverReserva id={r.id} dia={dia} destino="/secretaria" />
               </li>
             ))}
           </ul>

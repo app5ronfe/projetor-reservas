@@ -7,6 +7,26 @@ import { diaLisboa } from '../lib/calendario';
 
 type Opcao = { id: string; nome: string };
 
+/** Remover exige dois passos: abrir o painel e confirmar com a caixa. */
+export function RemoverReserva({ id, dia, destino }: { id: string; dia: string; destino: string }) {
+  return (
+    <details className="remover">
+      <summary className="btn perigo">Remover reserva…</summary>
+      <div className="remover-caixa">
+        <p>Esta ação remove a reserva da agenda. Confirme que avisou o responsável antes de continuar.</p>
+        <form action={cancelarAcao}>
+          <input type="hidden" name="id" value={id} />
+          <input type="hidden" name="dia" value={dia} />
+          <input type="hidden" name="avisei" value="sim" />
+          <input type="hidden" name="destino" value={destino} />
+          <label className="checar"><input type="checkbox" required /> Sim, quero remover esta reserva</label>
+          <button type="submit" className="btn perigo">Confirmar remoção</button>
+        </form>
+      </div>
+    </details>
+  );
+}
+
 export function ControloGestao({
   reservas, seccoes, deptos, filtro, de, ate, hoje,
 }: {
@@ -92,13 +112,7 @@ export function ControloGestao({
                     <button type="submit" className="btn">Guardar alterações</button>
                   </form>
                 </details>
-                <form action={cancelarAcao}>
-                  <input type="hidden" name="id" value={r.id} />
-                  <input type="hidden" name="dia" value={dia} />
-                  <input type="hidden" name="avisei" value="sim" />
-                  <input type="hidden" name="destino" value="gestao" />
-                  <button type="submit" className="btn perigo">Remover reserva</button>
-                </form>
+                <RemoverReserva id={r.id} dia={dia} destino="gestao" />
               </li>
             );
           })}

@@ -159,3 +159,8 @@ ul.lista li:last-child { border-bottom:0; }
 .tab-est th { font-size:12px; color:var(--texto-suave); font-weight:600; }
 .tab-est .num { text-align:right; font-variant-numeric:tabular-nums; }
 .tab-est tr.total td { font-weight:700; border-bottom:0; }
+.remover > summary { list-style:none; display:block; text-align:center; cursor:pointer; }
+.remover > summary::-webkit-details-marker { display:none; }
+.remover-caixa { margin-top:8px; padding:12px; background:#FBEAEA; border-radius:12px; font-size:14px; color:#7A1B14; }
+.remover-caixa p { margin:0 0 8px; }
+.remover-caixa .checar { color:#7A1B14; }
