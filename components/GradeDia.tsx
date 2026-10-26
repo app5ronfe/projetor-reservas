@@ -47,7 +47,7 @@ export default function GradeDia({ dia, reservas, bloqueios, comReservar, seccao
           </div>
         );
       })}
-      <div className="pequeno" style={{ marginTop: 8 }}>Blocos de 30 minutos, hora de Lisboa.</div>
+      <div className="pequeno" style={{ marginTop: 8 }}>Blocos de 1 hora, hora de Lisboa.</div>
     </div>
   );
 }

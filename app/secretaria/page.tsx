@@ -61,8 +61,8 @@ export default async function Secretaria({ searchParams }: { searchParams: Promi
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="dia" value={dia} />
                     <div className="linha">
-                      <div><label>Início</label><input name="inicio" type="time" step={1800} defaultValue={horaDe(new Date(r.inicio))} required /></div>
-                      <div><label>Fim</label><input name="fim" type="time" step={1800} defaultValue={horaDe(new Date(r.fim))} required /></div>
+                      <div><label>Início</label><input name="inicio" type="time" step={3600} defaultValue={horaDe(new Date(r.inicio))} required /></div>
+                      <div><label>Fim</label><input name="fim" type="time" step={3600} defaultValue={horaDe(new Date(r.fim))} required /></div>
                     </div>
                     <label>Responsável</label><input name="responsavel" defaultValue={r.responsavel} required />
                     <label>Motivo</label><input name="motivo" defaultValue={r.motivo} required />
@@ -119,8 +119,8 @@ export default async function Secretaria({ searchParams }: { searchParams: Promi
             <form action={prepararBloqueioAcao}>
               <input type="hidden" name="dia" value={dia} />
               <div className="linha">
-                <div><label>Início</label><input name="inicio" type="time" step={1800} required /></div>
-                <div><label>Fim</label><input name="fim" type="time" step={1800} required /></div>
+                <div><label>Início</label><input name="inicio" type="time" step={3600} required /></div>
+                <div><label>Fim</label><input name="fim" type="time" step={3600} required /></div>
               </div>
               <label>Motivo</label>
               <input name="motivo" required />

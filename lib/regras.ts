@@ -2,9 +2,9 @@
 // (funções SQL) repete as mesmas regras e é a que prevalece em caso de conflito.
 
 export const FUSO = "Europe/Lisbon";
-export const BLOCO_MIN = 30;
+export const BLOCO_MIN = 60;
 export const HORA_LIMITE = 21; // 21:00 do dia anterior
-export const MINUTO_BLOCO = [0, 30];
+export const MINUTO_BLOCO = [0];
 
 export type Intervalo = { inicio: Date; fim: Date };
 
@@ -61,11 +61,11 @@ export function validarIntervalo(i: Intervalo): Erro | null {
   for (const d of [i.inicio, i.fim]) {
     const p = partesLisboa(d);
     if (!MINUTO_BLOCO.includes(p.min) || p.s !== 0) {
-      return { codigo: "BLOCO_INVALIDO", mensagem: "As reservas são em blocos de 30 minutos (ex.: 10:00, 10:30)." };
+      return { codigo: "BLOCO_INVALIDO", mensagem: "As reservas são em blocos de 1 hora (ex.: 10:00, 11:00)." };
     }
   }
   const minutos = (i.fim.getTime() - i.inicio.getTime()) / 60000;
-  if (minutos % BLOCO_MIN !== 0) return { codigo: "BLOCO_INVALIDO", mensagem: "A duração tem de ser múltipla de 30 minutos." };
+  if (minutos % BLOCO_MIN !== 0) return { codigo: "BLOCO_INVALIDO", mensagem: "A duração tem de ser múltipla de 1 hora." };
   return null;
 }
 

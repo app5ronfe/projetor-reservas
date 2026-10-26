@@ -44,9 +44,9 @@ export default async function Reservar({ searchParams }: { searchParams: Promise
               <input type="hidden" name="dia" value={dia} />
               <div className="linha">
                 <div><label htmlFor="inicio">Início</label>
-                  <input id="inicio" name="inicio" type="time" step={1800} defaultValue={inicioHora} required /></div>
+                  <input id="inicio" name="inicio" type="time" step={3600} defaultValue={inicioHora} required /></div>
                 <div><label htmlFor="fim">Fim</label>
-                  <input id="fim" name="fim" type="time" step={1800} defaultValue={fimHora} required /></div>
+                  <input id="fim" name="fim" type="time" step={3600} defaultValue={fimHora} required /></div>
               </div>
               <label htmlFor="responsavel">Nome do responsável *</label>
               <input id="responsavel" name="responsavel" required />
@@ -65,7 +65,7 @@ export default async function Reservar({ searchParams }: { searchParams: Promise
               </select>
               <label htmlFor="descricao">Se escolheu «Outro», descreva brevemente</label>
               <input id="descricao" name="descricao" placeholder="Ex.: visita da junta de freguesia" />
-              <p className="pequeno">Preencha a secção, o departamento ou a entidade. Blocos de 30 minutos.</p>
+              <p className="pequeno">Preencha a secção, o departamento ou a entidade. Blocos de 1 hora.</p>
               <button type="submit" className="btn">Reservar</button>
             </form>
           )}

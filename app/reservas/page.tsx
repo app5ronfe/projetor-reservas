@@ -3,7 +3,7 @@ import { sessaoAtual, reservasEntre, bloqueiosEntre, minhasReservas } from '../.
 import { diaAtual, horaDe, formatarInstante } from '../../lib/tempo';
 import { prazoReserva } from '../../lib/regras';
 import { intervaloVisivel, Vista } from '../../lib/calendario';
-import { Barra, VistaMes, VistaSemana, VistaDia, type Origem } from '../../components/Vistas';
+import { Barra, VistaMes, VistaSemana, VistaDia, Legenda, type Origem, type Aba } from '../../components/Vistas';
 import { cancelarAcao, sairAcao } from '../actions';
 
 type Q = { vista?: string; dia?: string; vo?: string; do?: string; ok?: string; erro?: string };
@@ -13,7 +13,8 @@ export default async function Reservas({ searchParams }: { searchParams: Promise
   const eu = await sessaoAtual();
   if (!eu?.dirigente && !eu?.gestao) redirect('/login');
   const q = await searchParams;
-  const vista: Vista = VISTAS.includes(q.vista as Vista) ? (q.vista as Vista) : 'semana';
+  const aba: Aba = q.vista === 'minhas' ? 'minhas' : VISTAS.includes(q.vista as Vista) ? (q.vista as Vista) : 'semana';
+  const vista: Vista = aba === 'minhas' ? 'semana' : aba;
   const dia = q.dia ?? diaAtual();
   const { inicio, fim } = intervaloVisivel(vista, dia);
   const [reservas, bloqueios, minhas] = await Promise.all([
@@ -33,13 +34,13 @@ export default async function Reservas({ searchParams }: { searchParams: Promise
         {q.ok && <div className="aviso ok">{q.ok}</div>}
         {q.erro && <div className="aviso erro">{q.erro}</div>}
 
-        <Barra vista={vista} dia={dia} origem={origem} />
-        {vista === 'mes' && <VistaMes {...vistaProps} />}
-        {vista === 'semana' && <VistaSemana {...vistaProps} />}
-        {vista === 'dia' && <VistaDia {...vistaProps} origem={origem} />}
+        <Barra vista={vista} dia={dia} origem={origem} aba={aba} />
+        {aba === 'mes' && <VistaMes {...vistaProps} />}
+        {aba === 'semana' && <VistaSemana {...vistaProps} />}
+        {aba === 'dia' && <VistaDia {...vistaProps} origem={origem} />}
+        {aba !== 'minhas' && <Legenda />}
 
-        <h2>Minhas reservas</h2>
-        <div className="cartao">
+        {aba === 'minhas' && <div className="cartao">
           {minhas.length === 0 && <p className="pequeno" style={{ margin: 0 }}>Não tem reservas futuras.</p>}
           <ul className="lista">
             {minhas.map((r) => {
@@ -62,7 +63,7 @@ export default async function Reservas({ searchParams }: { searchParams: Promise
               );
             })}
           </ul>
-        </div>
+        </div>}
       </main>
     </>
   );

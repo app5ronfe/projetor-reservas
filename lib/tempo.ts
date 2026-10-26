@@ -49,13 +49,13 @@ export function formatarInstante(data: Date): string {
   }).format(data);
 }
 
-/** 48 blocos de 30 minutos de um dia, em hora de Lisboa. */
+/** 24 blocos de 1 hora de um dia, em hora de Lisboa. */
 export function blocosDoDia(dia: string) {
   const out: { inicio: Date; fim: Date; hora: string }[] = [];
   const { inicio } = limitesDia(dia);
-  for (let i = 0; i < 48; i++) {
-    const s = new Date(inicio.getTime() + i * 30 * 60000);
-    out.push({ inicio: s, fim: new Date(s.getTime() + 30 * 60000), hora: horaDe(s) });
+  for (let i = 0; i < 24; i++) {
+    const s = new Date(inicio.getTime() + i * 60 * 60000);
+    out.push({ inicio: s, fim: new Date(s.getTime() + 60 * 60000), hora: horaDe(s) });
   }
   return out;
 }

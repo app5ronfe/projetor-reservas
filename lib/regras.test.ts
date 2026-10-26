@@ -28,11 +28,11 @@ test("partes de Lisboa para um instante conhecido", () => {
   assert.deepEqual([p.d, p.h, p.min], [23, 21, 0]);
 });
 
-test("blocos de 30 minutos: aceita 10:00–11:30, recusa 10:15 e duração de 45 min", () => {
-  const ok = { inicio: lisboaParaInstante(2026, 10, 24, 10, 0), fim: lisboaParaInstante(2026, 10, 24, 11, 30) };
+test("blocos de 1 hora: aceita 10:00–12:00, recusa 10:30 e duração de 90 min", () => {
+  const ok = { inicio: lisboaParaInstante(2026, 10, 24, 10, 0), fim: lisboaParaInstante(2026, 10, 24, 12, 0) };
   assert.equal(validarIntervalo(ok), null);
-  assert.equal(validarIntervalo({ inicio: lisboaParaInstante(2026, 10, 24, 10, 15), fim: lisboaParaInstante(2026, 10, 24, 11, 0) })?.codigo, "BLOCO_INVALIDO");
-  assert.equal(validarIntervalo({ inicio: lisboaParaInstante(2026, 10, 24, 10, 0), fim: lisboaParaInstante(2026, 10, 24, 10, 45) })?.codigo, "BLOCO_INVALIDO");
+  assert.equal(validarIntervalo({ inicio: lisboaParaInstante(2026, 10, 24, 10, 30), fim: lisboaParaInstante(2026, 10, 24, 11, 30) })?.codigo, "BLOCO_INVALIDO");
+  assert.equal(validarIntervalo({ inicio: lisboaParaInstante(2026, 10, 24, 10, 0), fim: lisboaParaInstante(2026, 10, 24, 11, 30) })?.codigo, "BLOCO_INVALIDO");
 });
 
 test("fim antes do início é recusado", () => {
@@ -42,7 +42,7 @@ test("fim antes do início é recusado", () => {
 test("sobreposição: blocos encostados não se sobrepõem; cruzados sim", () => {
   const a = { inicio: lisboaParaInstante(2026, 10, 24, 10, 0), fim: lisboaParaInstante(2026, 10, 24, 11, 0) };
   const b = { inicio: lisboaParaInstante(2026, 10, 24, 11, 0), fim: lisboaParaInstante(2026, 10, 24, 12, 0) };
-  const c = { inicio: lisboaParaInstante(2026, 10, 24, 10, 30), fim: lisboaParaInstante(2026, 10, 24, 11, 30) };
+  const c = { inicio: lisboaParaInstante(2026, 10, 24, 10, 30), fim: lisboaParaInstante(2026, 10, 24, 12, 30) };
   assert.equal(sobrepoe(a, b), false);
   assert.equal(sobrepoe(a, c), true);
 });

@@ -7,7 +7,9 @@ import {
   diasDaSemana, diaDaSemana, navegar,
 } from '../lib/calendario';
 import { diaAtual, limitesDia } from '../lib/tempo';
+import { corDaReserva, LEGENDA } from '../lib/cores';
 
+export type Aba = Vista | 'minhas';
 const NOME_VISTA: Record<Vista, string> = { mes: 'Mês', semana: 'Semana', dia: 'Dia' };
 const ligacao = (vista: Vista, dia: string) => `/reservas?vista=${vista}&dia=${dia}`;
 
@@ -18,7 +20,7 @@ const NOME_ORIGEM: Record<Origem['vista'], string> = { mes: 'mês', semana: 'sem
 const ligacaoDia = (d: string, origem: Origem) => `/reservas?vista=dia&dia=${d}&vo=${origem.vista}&do=${origem.dia}`;
 
 /** Barra de navegação: vistas, setas, «Hoje» e o título do período. */
-export function Barra({ vista, dia, origem }: { vista: Vista; dia: string; origem?: Origem }) {
+export function Barra({ vista, dia, origem, aba }: { vista: Vista; dia: string; origem?: Origem; aba: Aba }) {
   const sufixo = vista === 'dia' && origem ? `&vo=${origem.vista}&do=${origem.dia}` : '';
   const nav = (v: Vista, d: string) => `/reservas?vista=${v}&dia=${d}${sufixo}`;
   const titulo =
@@ -29,15 +31,18 @@ export function Barra({ vista, dia, origem }: { vista: Vista; dia: string; orige
     <div className="barra-cal">
       <div className="segmentos">
         {(['mes', 'semana', 'dia'] as Vista[]).map((v) => (
-          <Link key={v} href={ligacao(v, dia)} className={v === vista ? 'ativo' : ''}>{NOME_VISTA[v]}</Link>
+          <Link key={v} href={ligacao(v, dia)} className={aba === v ? 'ativo' : ''}>{NOME_VISTA[v]}</Link>
         ))}
+        <Link href="/reservas?vista=minhas" className={`minhas ${aba === 'minhas' ? 'ativo' : ''}`}>Minhas reservas</Link>
       </div>
+      {aba === 'minhas' ? <strong className="titulo">As minhas reservas futuras</strong> : <>
       <div className="setas">
         <Link href={nav(vista, navegar(vista, dia, -1))} aria-label="Anterior">‹</Link>
         <Link href={nav(vista, diaAtual())} className="hoje">Hoje</Link>
         <Link href={nav(vista, navegar(vista, dia, 1))} aria-label="Seguinte">›</Link>
       </div>
       <strong className="titulo">{titulo}</strong>
+      </>}
     </div>
   );
 }
@@ -65,6 +70,11 @@ export function VistaMes({ dia, reservas, bloqueios }: Props) {
             <Link key={d} href={ligacaoDia(d, { vista: 'mes', dia })} className={classes}>
               <span className="numero">{Number(d.slice(8))}</span>
               {nos.length > 0 && <span className="contagem">{nos.length}</span>}
+              {nos.length > 0 && (
+                <span className="pontos">
+                  {nos.slice(0, 6).map((r) => <i key={r.id} style={{ background: corDaReserva(r).cor }} />)}
+                </span>
+              )}
               {bloq && <span className="marca-bloq" title="Há bloqueios" />}
             </Link>
           );
@@ -95,7 +105,7 @@ export function VistaSemana({ dia, reservas, bloqueios }: Props) {
             {nos.length === 0 && bl.length === 0 && <p className="pequeno" style={{ margin: '4px 0 0' }}>Sem reservas.</p>}
             <ul className="lista">
               {nos.map((r) => (
-                <li key={r.id}>
+                <li key={r.id} style={{ borderLeft: `4px solid ${corDaReserva(r).cor}`, paddingLeft: 8 }}>
                   <strong>{horaDe(new Date(r.inicio))}–{horaDe(new Date(r.fim))}</strong> · {r.motivo}
                   <div className="pequeno">{r.responsavel} · {r.seccao ?? 'Departamento'}</div>
                 </li>
@@ -109,7 +119,18 @@ export function VistaSemana({ dia, reservas, bloqueios }: Props) {
   );
 }
 
-/** Dia: os 48 blocos de 30 minutos em grelha (4 colunas no telemóvel, 5 no ecrã largo). */
+/** Legenda das cores das secções, entidades e departamentos. */
+export function Legenda() {
+  return (
+    <div className="legenda">
+      {LEGENDA.map((l) => (
+        <span key={l.rotulo}><i style={{ background: l.cor }} />{l.rotulo}</span>
+      ))}
+    </div>
+  );
+}
+
+/** Dia: os 24 blocos de 1 hora em grelha (4 colunas no telemóvel, 5 no ecrã largo). */
 export function VistaDia({ dia, reservas, bloqueios, gestao, origem }: Props & { origem?: Origem }) {
   const agora = new Date();
   const diaPassou = passado(dia);
@@ -131,12 +152,14 @@ export function VistaDia({ dia, reservas, bloqueios, gestao, origem }: Props & {
             const res = reservas.find((r) => sobrepoe({ inicio: new Date(r.inicio), fim: new Date(r.fim) }, b));
             const ja = diaPassou || b.inicio < agora;
             let estado: string;
+            let corBloco: string | undefined;
             let conteudo: React.ReactNode;
             if (bloq) {
               estado = 'bloq';
               conteudo = <span title={bloq.motivo}>Bloqueado</span>;
             } else if (res) {
               estado = 'ocup';
+              corBloco = corDaReserva(res).cor;
               conteudo = <span title={`${res.responsavel} · ${res.motivo}`}>{res.responsavel}</span>;
             } else if (ja) {
               estado = 'passado';
@@ -149,14 +172,14 @@ export function VistaDia({ dia, reservas, bloqueios, gestao, origem }: Props & {
               conteudo = <span title="Prazo terminado: ligue à Chefe Daniela">Ligar</span>;
             }
             return (
-              <div key={b.hora} className={`bloco-c ${estado}`}>
+              <div key={b.hora} className={`bloco-c ${estado}`} style={corBloco ? { borderLeft: `5px solid ${corBloco}` } : undefined}>
                 <span className="hora-c">{b.hora}</span>
                 <span className="estado-c">{conteudo}</span>
               </div>
             );
           })}
         </div>
-        <div className="pequeno" style={{ marginTop: 8 }}>Blocos de 30 minutos, hora de Lisboa. Toque num bloco livre para reservar.</div>
+        <div className="pequeno" style={{ marginTop: 8 }}>Blocos de 1 hora, hora de Lisboa. Toque num bloco livre para reservar.</div>
       </div>
     </>
   );

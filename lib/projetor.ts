@@ -34,7 +34,7 @@ const MENSAGENS: Record<string, string> = {
   MOTIVO_EM_FALTA: 'Indique o motivo.',
   SECCAO_EM_FALTA: 'Indique a secção, o departamento ou a entidade.',
   DESCRICAO_EM_FALTA: 'Para «Outro», descreva brevemente o que é.',
-  BLOCO_INVALIDO: 'As reservas são em blocos de 30 minutos.',
+  BLOCO_INVALIDO: 'As reservas são em blocos de 1 hora.',
   INTERVALO_INVALIDO: 'A hora de fim tem de ser depois da hora de início.',
 };
 
