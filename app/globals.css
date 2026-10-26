@@ -100,3 +100,42 @@ ul.lista li:last-child { border-bottom:0; }
 .legenda { display:flex; flex-wrap:wrap; gap:6px 12px; margin:10px 2px 14px; font-size:12px; color:var(--texto-suave); }
 .legenda span { display:inline-flex; align-items:center; gap:6px; }
 .legenda i { width:12px; height:12px; border-radius:4px; display:inline-block; }
+
+/* Layout do calendário: mini-mês ao lado (no ecrã largo), agenda por horas */
+.cal-layout { display:grid; gap:14px; }
+@media (min-width:900px) { .cal-layout { grid-template-columns:250px 1fr; align-items:start; } }
+.cal-lateral { display:flex; flex-direction:column; gap:12px; }
+.cal-principal { min-width:0; }
+.mini { background:#fff; border:1px solid var(--borda); border-radius:14px; padding:10px; }
+.mini-cab { display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:14px; text-transform:capitalize; }
+.mini-cab a { color:var(--cor); text-decoration:none; font-size:20px; font-weight:700; padding:0 8px; }
+.mini-grelha { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center; }
+.mini-dn { font-size:11px; color:var(--texto-suave); padding:2px 0; }
+.mini-d { font-size:12px; padding:6px 0; border-radius:50%; text-decoration:none; color:var(--texto); }
+.mini-d.fora { color:#B5BDB9; }
+.mini-d.hoje { box-shadow:inset 0 0 0 1.5px var(--cor); font-weight:700; }
+.mini-d.sel { background:var(--cor); color:#fff; font-weight:700; }
+
+/* Agenda: colunas de horas, linhas coloridas por reserva */
+.agenda { --hora:52px; background:#fff; border:1px solid var(--borda); border-radius:14px; position:relative; }
+.ag-cab { display:grid; grid-template-columns:44px repeat(var(--cols),1fr); background:#F4F9F6; border-bottom:1px solid var(--borda); border-radius:14px 14px 0 0; }
+.ag-dia { display:flex; flex-direction:column; align-items:center; padding:8px 0; font-size:11px; color:var(--texto-suave); }
+.ag-dia strong { font-size:17px; color:var(--texto); }
+.ag-dia.hoje strong { color:#fff; background:var(--cor); border-radius:50%; width:30px; height:30px; line-height:30px; text-align:center; }
+.ag-corpo { display:grid; grid-template-columns:44px repeat(var(--cols),1fr); position:relative; }
+.ag-horas { position:relative; }
+.ag-horas span { position:absolute; right:6px; transform:translateY(-50%); font-size:11px; color:var(--texto-suave); font-variant-numeric:tabular-nums; }
+.ag-col { position:relative; border-left:1px solid #EAF0EC; background:linear-gradient(to bottom, #E3EBE6 1px, transparent 1px) 0 0 / 100% var(--hora); }
+.ag-slot { position:absolute; left:0; right:0; z-index:1; }
+.ag-slot:hover { background:rgba(34,121,86,.07); }
+.ag-ev { position:absolute; left:3px; right:3px; border-left:4px solid; border-radius:6px; padding:3px 5px; font-size:12px; line-height:1.25; color:var(--texto); cursor:pointer; z-index:5; }
+.ag-ev.ativo { z-index:40; }
+.ag-txt { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ag-bloq { position:absolute; left:2px; right:2px; z-index:4; border-radius:6px; padding:3px 5px; font-size:11px; color:var(--perigo); overflow:hidden; background:repeating-linear-gradient(45deg,#FBEAEA 0 6px,#F6D5D5 6px 12px); }
+.balao { position:absolute; top:0; left:0; z-index:50; width:230px; background:#fff; border:1px solid var(--borda); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.18); padding:10px 12px; font-size:13px; color:var(--texto); cursor:default; line-height:1.35; }
+.balao.esq { left:auto; right:0; }
+.balao strong { display:block; margin-bottom:2px; }
+.ag-fundo { position:fixed; inset:0; z-index:30; background:transparent; }
+/* Semana no telemóvel: só as cores; o texto aparece a partir de 600px */
+.agenda.semana .ag-txt { display:none; }
+@media (min-width:600px) { .agenda.semana .ag-txt { display:block; } }
